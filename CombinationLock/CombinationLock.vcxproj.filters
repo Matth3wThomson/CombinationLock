@@ -5,7 +5,9 @@
     <ClCompile Include="NumberSet.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="JobCompleter.cpp" />
+    <ClCompile Include="JobCompleter.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.h">
@@ -17,7 +19,9 @@
     <ClInclude Include="MatrixDefinition.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="JobCompleter.h" />
+    <ClInclude Include="JobCompleter.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
