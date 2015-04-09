@@ -18,6 +18,12 @@
 
 class NumberSet
 {
+	//Properties
+private:
+
+	int* numberArr;
+	unsigned int base, digits;
+
 public:
 	NumberSet(const unsigned int base, const unsigned int digits);
 	NumberSet(const NumberSet& rhs);
@@ -38,9 +44,8 @@ public:
 	void becomeLargest();
 
 private:
+	//No default construction
 	NumberSet();
 	void Increment();
-	int* numberArr;
-	unsigned int base, digits;
 };
 

@@ -1,11 +1,13 @@
 
+//Basic includes
 #include <iostream>
 #include <fstream>
 #include <set>
 #include <algorithm>
 #include <string>
 #include <stdio.h>
-//#include <ctype.h>
+
+//Helper class includes
 #include "Matrix.h"
 #include "NumberSet.h"
 
@@ -109,8 +111,6 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	noWheels = wheel.getHeight();
 	noLetters = wheel.getWidth();
 
-	
-
 	//DEBUGGING
 	//Print dictionary
 	/*std::cout << "Dictionary: " << std::endl;
@@ -134,6 +134,8 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 
 	//Just try and find all words at the first index of each wheel
 	FindWordsFunction(0, dictionary, wheel, foundWords);
+
+	//Threading experimentation
 
 	//Found words now contains all words found by the find words function
 	for (auto itr = foundWords.begin(); itr != foundWords.end(); ++itr){
@@ -278,12 +280,17 @@ void FindWordsFunction(int index,
 	//For each wheel we will start at
 	for (int i = 0; i < noWheels - 2; ++i){
 
+		std::cout << "Testing from wheel " << i << std::endl;
+
 		//For all possible lengths of words we can look for given the wheel
 		//we are starting at
 		for (int j = 2; j <= noWheels - i; ++j){
 
+			std::cout << "Testing words of length " << j << std::endl;
+
 			//Store the word we are going to search for, which is of size j
-			char* const word = new char[j];
+			//char* const word = new char[j];
+			std::string word = std::string(j, ' ');
 
 			//Initialize the first element to the value of the wheel we are currently
 			//starting at, and the index we are currently using as our start index
@@ -303,8 +310,7 @@ void FindWordsFunction(int index,
 			}
 
 			//And check if its a word
-			std::string test(word);
-			if (dictionary.find(test) != dictionary.end()) output.insert(test);
+			if (dictionary.find(word) != dictionary.end()) output.insert(word);
 
 			do {
 				//Try the next combination
@@ -320,15 +326,10 @@ void FindWordsFunction(int index,
 				}
 
 				//And check if the word exists in the dictionary
-				std::string test(word);
-				std::cout << "Testing: " << test << std::endl;
-				if (dictionary.find(test) != dictionary.end()) output.insert(test);
+				if (dictionary.find(word) != dictionary.end()) output.insert(word);
 
 			//Until we have tried all combinations
 			} while (!possibleCombination.isLargest());
-
-			//We no longer need our word
-			delete word;
 		}
 	}
 

@@ -79,10 +79,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="JobCompleter.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NumberSet.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="JobCompleter.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixDefinition.h" />
     <ClInclude Include="NumberSet.h" />
