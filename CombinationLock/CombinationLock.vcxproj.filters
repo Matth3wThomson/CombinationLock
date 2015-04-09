@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="NumberSet.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Matrix.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberSet.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixDefinition.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{f90be8af-e3ab-4ebc-b67b-b0003f53dc5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{91b669b6-ccdd-435d-b036-e3c1db1212d3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
