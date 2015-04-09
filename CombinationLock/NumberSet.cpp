@@ -11,7 +11,8 @@ NumberSet::NumberSet(const uint base, const uint digits){
 	this->base = base;
 
 	//There must be at least 2 digits!
-	assert(digits > 1);
+	assert(digits > 0);
+
 	this->digits = digits;
 	numberArr = new int[digits];
 
@@ -72,7 +73,7 @@ void NumberSet::Increment(){
 			}
 
 			//The number set has been incremented
-			break;
+			return;
 		}
 	}
 

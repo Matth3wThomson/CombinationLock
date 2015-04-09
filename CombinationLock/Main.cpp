@@ -2,7 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <algorithm>
 #include <string>
+#include <stdio.h>
+//#include <ctype.h>
 #include "Matrix.h"
 #include "NumberSet.h"
 
@@ -11,8 +14,8 @@
 	M Letters per wheel
 	N Wheels
 
-	argv[1] = Wheel info
-	argv[2] = Dictionary
+	argv[1] = Wheel info (Each char is upper case)
+	argv[2] = Dictionary (Each char is lower case)
 
 	PLANS:
 	-Parse the entire dictionary into a set (ordered, and avoids duplicates... quicker automatic searching)
@@ -54,8 +57,8 @@ void testNumberSet();
 
 int main(int argc, char* argv[]){
 
-	//SolveCombinationLock(argv[1], argv[2]);
-	testNumberSet();
+	SolveCombinationLock(argv[1], argv[2]);
+	//testNumberSet();
 
 
 	return 0;
@@ -106,14 +109,9 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	noWheels = wheel.getHeight();
 	noLetters = wheel.getWidth();
 
-	//Then for every number of letters call the find words function. 
-	//TODO: Put threading in here... why have 1 thread process all starting indexes!
-	/*for (int i = 0; i < noLetters; ++i){
-		FindWordsFunction(i, dictionary, wheel, foundWords);
-		}*/
+	
 
 	//DEBUGGING
-
 	//Print dictionary
 	/*std::cout << "Dictionary: " << std::endl;
 	for (auto itr = dictionary.begin(); itr != dictionary.end(); ++itr){
@@ -126,8 +124,16 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	std::cout << "Number of Wheels: " << noWheels << std::endl;
 	std::cout << "Number of letters per wheel: " << noLetters << std::endl;
 	std::cout << wheel << std::endl;
-
 	//END DEBUGGING
+
+	//Then for every number of letters call the find words function. 
+	//TODO: Put threading in here... why have 1 thread process all starting indexes!
+	/*for (int i = 0; i < noLetters; ++i){
+	FindWordsFunction(i, dictionary, wheel, foundWords);
+	}*/
+
+	//Just try and find all words at the first index of each wheel
+	FindWordsFunction(0, dictionary, wheel, foundWords);
 
 	//Found words now contains all words found by the find words function
 	for (auto itr = foundWords.begin(); itr != foundWords.end(); ++itr){
@@ -147,8 +153,13 @@ bool ParseDictionary(const char* filename, std::set<std::string>& dictionary){
 	if (file.is_open()){
 
 		while (!file.eof()){
+
+			//Load in the string
 			std::string temp;
 			file >> temp;
+			
+			//Ensure that the word is indeed in lower case, and insert into dictionary
+			std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
 			dictionary.insert(temp);
 		}
 
@@ -178,7 +189,7 @@ Matrix<char> ParseWheel(const char* filename){
 			for (int j = 0; j < noLetters; ++j){
 				char temp;
 				file >> temp;
-				wheel.setElement(i, j, temp);
+				wheel.setElement(i, j, tolower(temp));
 			}
 		}
 
@@ -255,8 +266,8 @@ void FindWordsFunction(int index,
 	std::set<std::string>& output){
 
 	//First discover what we need
-	const int& noWheels = wheel.getYDim();
-	const int& noLetters = wheel.getXDim();
+	const int& noWheels = wheel.getXDim();
+	const int& noLetters = wheel.getYDim();
 
 	//Make sure we aren't out of bounds.
 	if (index >= noWheels){
@@ -271,16 +282,53 @@ void FindWordsFunction(int index,
 		//we are starting at
 		for (int j = 2; j <= noWheels - i; ++j){
 
-			//Store the word we are going to search for, initializing our first character
-			//to the value of the index we have been delegated of each wheel we will test
-			char* word = new char[j];
+			//Store the word we are going to search for, which is of size j
+			char* const word = new char[j];
+
+			//Initialize the first element to the value of the wheel we are currently
+			//starting at, and the index we are currently using as our start index
 			word[0] = wheel.getElement(i, index);
-
-			//Possible combinations of the words from this point are based on
-			// a number of base letters, with length wheels (left from this point)
-			NumberSet test(noLetters, noWheels - (i + 1));
-
 			
+			//We now want to try every combination of the wheels left, with the word length
+			//we want. So we need a number set of size j-1, with base noLetters
+			NumberSet possibleCombination(noLetters, j - 1);
+			
+			//Get the next word by retrieving the indexes we want
+			for (int letter = 1; letter < j; ++letter){
+
+				// -The letter we want is in the the wheel at i + letter we are looking at.
+				// -The letter we are going to choose is based on the possible combination we
+				//	are trying next. This is in the combination at letter - 1 (it is of size j - 1 )
+				word[letter] = wheel.getElement(i+letter, possibleCombination.getDigit(letter - 1));
+			}
+
+			//And check if its a word
+			std::string test(word);
+			if (dictionary.find(test) != dictionary.end()) output.insert(test);
+
+			do {
+				//Try the next combination
+				++possibleCombination;
+
+				//Make our words change their letters appropriately
+				for (int letter = 1; letter < j; ++letter){
+
+					// -The letter we want is in the the wheel at i + letter we are looking at.
+					// -The letter we are going to choose is based on the possible combination we
+					//	are trying next
+					word[letter] = wheel.getElement(i + letter, possibleCombination.getDigit(letter - 1));
+				}
+
+				//And check if the word exists in the dictionary
+				std::string test(word);
+				std::cout << "Testing: " << test << std::endl;
+				if (dictionary.find(test) != dictionary.end()) output.insert(test);
+
+			//Until we have tried all combinations
+			} while (!possibleCombination.isLargest());
+
+			//We no longer need our word
+			delete word;
 		}
 	}
 
