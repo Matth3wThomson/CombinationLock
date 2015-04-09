@@ -2,6 +2,9 @@
 
 
 /**
+	Class: NumberSet
+	Author: Matthew Thomson 2015
+
 	The customizable version of a bitset. Ie, a supplied number-set.
 	
 	The idea of this class is to basically have a number that has

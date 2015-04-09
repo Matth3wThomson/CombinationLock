@@ -48,15 +48,30 @@ void JobCompleter::acquireJob(){
 	}
 }
 
-void JobCompleter::GiveJob(std::function<void()>& job){
+void JobCompleter::GiveJob(const std::function<void()>& job){
 
 	jobQueueMut.lock();
 	jobQueue.push(job);
 	jobQueueMut.unlock();
 }
 
-bool JobCompleter::JobsLeft(){
+void JobCompleter::CloseOnceComplete(){
 
-	//No need for lock here as queues are internally thread safe
-	return !jobQueue.empty();
+	//While there are jobs left wait
+	while (!jobQueue.empty()){
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	//Once jobs are all allocated, indicate to threads they have
+	//completed their last job
+	toTerminate = true;
+
+	//Attempt to join to all threads
+	for (uint i = 0; i < threadArray.size(); ++i)
+		if (threadArray[i].joinable()) threadArray[i].join();
+	
+	//Empty the thread array, (if it isnt already empty)
+	while (!threadArray.empty()){
+		threadArray.pop_back();
+	}
 }

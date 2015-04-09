@@ -11,6 +11,9 @@
 #endif
 
 /*
+	Class: Matrix<T>
+	Author: Matthew Thomson 2015
+	
 NOTES:
 		-Performance of exceptions that arent thrown or caught identical to functions that dont throw,
 		 therefore exceptions used on functions where matrices must be of identical size, as program

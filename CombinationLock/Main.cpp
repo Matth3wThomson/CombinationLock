@@ -11,6 +11,9 @@
 #include "Matrix.h"
 #include "NumberSet.h"
 
+//Self-made job completer
+#include "JobCompleter.h"
+
 /*
 	INFO:
 	M Letters per wheel
@@ -55,6 +58,7 @@ void FindWordsFunction(int index,
 	const Matrix<char>& wheel,
 	std::set<std::string>& output);
 
+//TODO: Remove
 void testNumberSet();
 
 int main(int argc, char* argv[]){
@@ -133,9 +137,27 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	}*/
 
 	//Just try and find all words at the first index of each wheel
-	FindWordsFunction(0, dictionary, wheel, foundWords);
+	//FindWordsFunction(0, dictionary, wheel, foundWords);
 
-	//Threading experimentation
+	//Just try and find all words at the last index of each wheel
+	FindWordsFunction(9, dictionary, wheel, foundWords);
+
+	//THREADING START
+	//Create jobCompleter with as many threads as is optimal for our solution
+	//JobCompleter jobCompleter(noLetters);
+
+	////Pass all the jobs which are based on a given start index to the 
+	////job completer
+	//for (int i = 0; i < noLetters; ++i){
+	//	jobCompleter.GiveJob(
+	//		[i, &dictionary, &wheel, &foundWords]{ 
+	//		FindWordsFunction(i, dictionary, wheel, foundWords);
+	//	}
+	//	);
+	//}
+
+	//jobCompleter.CloseOnceComplete();
+	//THREADING END
 
 	//Found words now contains all words found by the find words function
 	for (auto itr = foundWords.begin(); itr != foundWords.end(); ++itr){
@@ -205,63 +227,6 @@ Matrix<char> ParseWheel(const char* filename){
 	}
 }
 
-//FIRST ATTEMPT
-//void FindWordsFunction(int index,
-//	const std::set<std::string>& dictionary,
-//	const Matrix<char>& wheel,
-//	std::set<std::string>& output){
-//
-//	//First discover what we need
-//	const int& noWheels = wheel.getYDim();
-//	const int& noLetters = wheel.getXDim();
-//
-//	//Make sure we aren't out of bounds.
-//	if (index >= noWheels){
-//		std::cerr << "Error: Requested index larger than matrix" << std::endl;
-//		throw std::exception("Error: Requested index larger than matrix");
-//	}
-//
-//	//For each wheel we will start at
-//	for (int i = 0; i < noWheels - 2; ++i){
-//
-//		//For all possible lengths of words we can look for given the wheel
-//		//we are starting at
-//		for (int j = 2; j <= noWheels - i; ++j){
-//
-//			//Store the word we are going to search for, initializing our first character
-//			//to the value of the index we have been delegated of each wheel we will test
-//			char* word = new char[j];
-//			word[0] = wheel.getElement(i, index);
-//
-//			//Loop through the wheels and initialize them all, other than
-//			//the start one to index 0.
-//			for (int k = i + 1; k < noWheels; ++k){
-//				word[k] = wheel.getElement(k, 0);
-//			}
-//
-//			//Then loop through each wheel once for every wheel
-//			//there is
-//			for (int k = i + 1; k < noWheels; ++k){
-//
-//				for (int l = k; l < noWheels; ++l){
-//					for (int m = 0; m < noLetters; ++m){
-//						word[k] = wheel.getElement(l, m);
-//
-//						//And check if its a word
-//						std::string test(word);
-//						if (dictionary.find(test) != dictionary.end()) output.insert(test);
-//					}
-//				}
-//
-//			}
-//
-//		}
-//	}
-//
-//
-//}
-
-//SECOND ATTEMPT USING NUMBERSET IMPLMENTATION
 void FindWordsFunction(int index,
 	const std::set<std::string>& dictionary,
 	const Matrix<char>& wheel,
@@ -272,21 +237,21 @@ void FindWordsFunction(int index,
 	const int& noLetters = wheel.getYDim();
 
 	//Make sure we aren't out of bounds.
-	if (index >= noWheels){
+	if (index >= noLetters){
 		std::cerr << "Error: Requested index larger than matrix" << std::endl;
 		throw std::exception("Error: Requested index larger than matrix");
 	}
 
 	//For each wheel we will start at
-	for (int i = 0; i < noWheels - 2; ++i){
+	for (int i = 0; i < noWheels - 1; ++i){
 
-		std::cout << "Testing from wheel " << i << std::endl;
+		std::cout << "Thread " << std::this_thread::get_id() << " testing from wheel " << i << std::endl;
 
 		//For all possible lengths of words we can look for given the wheel
 		//we are starting at
 		for (int j = 2; j <= noWheels - i; ++j){
 
-			std::cout << "Testing words of length " << j << std::endl;
+			std::cout << "Thread " << std::this_thread::get_id() << " testing words of length " << j << std::endl;
 
 			//Store the word we are going to search for, which is of size j
 			//char* const word = new char[j];
