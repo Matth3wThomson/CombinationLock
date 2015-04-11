@@ -5,7 +5,8 @@
 //In the cpp to prevent infecting other files that include
 typedef unsigned int uint; 
 
-NumberSet::NumberSet(const uint base, const uint digits){
+NumberSet::NumberSet(const uint base, const uint digits):
+bIsLargest(false){
 	//You cant have a number system of lower than base 2
 	assert(base > 1);
 	this->base = base;
@@ -23,6 +24,7 @@ NumberSet::NumberSet(const uint base, const uint digits){
 NumberSet::NumberSet(const NumberSet& rhs){
 	this->base = rhs.base;
 	this->digits = rhs.digits;
+	this->bIsLargest = rhs.bIsLargest;
 
 	//Perform deep copy
 	numberArr = new int[digits];
@@ -77,25 +79,23 @@ void NumberSet::Increment(){
 		}
 	}
 
-	//If we reach here then the number cannot be incremented higher than it currently
-	//is. So we will just loop back around, setting all digits to zero.
-	for (uint i = 0; i < digits; ++i){
-		numberArr[i] = 0;
-	}
+	bIsLargest = true;
 }
 
 bool NumberSet::isLargest(){
 
-	//Loop through from lowest significant number to the highest significant number
-	for (int i = digits - 1; i >= 0; --i){
+	////Loop through from lowest significant number to the highest significant number
+	//for (int i = digits - 1; i >= 0; --i){
 
-		//If any digit is lower than the maximum base number, then it's clearly
-		//not the largest number possible!
-		if (numberArr[i] < (int) base - 1) return false;
-	}
+	//	//If any digit is lower than the maximum base number, then it's clearly
+	//	//not the largest number possible!
+	//	if (numberArr[i] < (int) base - 1) return false;
+	//}
 
-	//Every number in the array as at the maximum base number!
-	return true;
+	////Every number in the array as at the maximum base number!
+	//return true;
+
+	return bIsLargest;
 }
 
 void NumberSet::becomeLargest(){

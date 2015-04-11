@@ -63,6 +63,11 @@ void testNumberSet();
 
 int main(int argc, char* argv[]){
 
+	if (!argv[1] || !argv[2]){
+		std::cerr << "Please pass the arguments in the format programname wheelsfile dictionaryfile";
+		return -1;
+	}
+
 	SolveCombinationLock(argv[1], argv[2]);
 	//testNumberSet();
 
@@ -140,7 +145,13 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	//FindWordsFunction(0, dictionary, wheel, foundWords);
 
 	//Just try and find all words at the last index of each wheel
-	FindWordsFunction(9, dictionary, wheel, foundWords);
+	//FindWordsFunction(9, dictionary, wheel, foundWords);
+
+	//Sequential test
+	for (int i = 0; i < noWheels; ++i){
+		FindWordsFunction(i, dictionary, wheel, foundWords);
+	}
+	
 
 	//THREADING START
 	//Create jobCompleter with as many threads as is optimal for our solution
@@ -196,9 +207,9 @@ bool ParseDictionary(const char* filename, std::set<std::string>& dictionary){
 
 Matrix<char> ParseWheel(const char* filename){
 
-	std::ifstream file;
+	std::ifstream file(filename);
 
-	file.open(filename);
+	//file.open(filename);
 
 	int noWheels, noLetters;
 

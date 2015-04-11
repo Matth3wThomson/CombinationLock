@@ -50,5 +50,6 @@ private:
 	//No default construction
 	NumberSet();
 	void Increment();
+	bool bIsLargest;
 };
 
