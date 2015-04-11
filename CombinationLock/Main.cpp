@@ -41,6 +41,9 @@
 /*
 	TASKS:
 		-Revisit error handling... it is a console application!
+		-Make threading work
+		-Neaten up code
+		-Explain all the uses for everything!
 */
 
 /* Essentially main for this task, but wrapped for brevity */
