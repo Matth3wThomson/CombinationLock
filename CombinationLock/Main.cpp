@@ -151,7 +151,8 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	//FindWordsFunction(9, dictionary, wheel, foundWords);
 
 	//Sequential test
-	for (int i = 0; i < noWheels; ++i){
+	for (int i = 0; i < noLetters; ++i){
+		std::cout << "Starting from letter " << i << std::endl;
 		FindWordsFunction(i, dictionary, wheel, foundWords);
 	}
 	
