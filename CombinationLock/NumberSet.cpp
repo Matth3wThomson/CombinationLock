@@ -13,16 +13,18 @@ baseTen(0){
 	assert(base > 1);
 	this->base = base;
 
-	//There must be at least 2 digits!
+	//There must be at least 1 digit
 	assert(digits > 0);
 
 	this->digits = digits;
-	numberArr = new int[digits];
+	numberArr = new uint[digits];
 
 	//Initialize to zero.
 	memset(numberArr, 0, digits * sizeof(int));
 
-	biggestNumber = getPossibleLargest();
+	//The formula to work out the largest number it is possible for
+	//this to hold
+	biggestNumber = (long long int) pow((long double)base, (int)digits) - 1;
 }
 
 NumberSet::NumberSet(const NumberSet& rhs){
@@ -31,7 +33,7 @@ NumberSet::NumberSet(const NumberSet& rhs){
 	this->bIsLargest = rhs.bIsLargest;
 
 	//Perform deep copy
-	numberArr = new int[digits];
+	numberArr = new uint[digits];
 	for (uint i = 0; i < digits; ++i){
 		numberArr[i] = rhs.numberArr[i];
 	}
@@ -43,9 +45,6 @@ NumberSet::~NumberSet()
 }
 
 int NumberSet::getDigit(const uint digit){
-
-	assert(digit < digits);
-
 	return numberArr[digit];
 }
 
@@ -68,7 +67,7 @@ void NumberSet::Increment(){
 	for (int i = digits - 1; i >= 0; --i){
 
 		//If the current digit is lower than the maximum base number
-		if (numberArr[i] < (int) base - 1){
+		if (numberArr[i] < (uint) base - 1){
 
 			//We can increment the current number
 			++numberArr[i];
@@ -85,22 +84,9 @@ void NumberSet::Increment(){
 			return;
 		}
 	}
-
-	//bIsLargest = true;
 }
 
 bool NumberSet::isLargest() const {
-
-	////Loop through from lowest significant number to the highest significant number
-	//for (int i = digits - 1; i >= 0; --i){
-
-	//	//If any digit is lower than the maximum base number, then it's clearly
-	//	//not the largest number possible!
-	//	if (numberArr[i] < (int) base - 1) return false;
-	//}
-
-	////Every number in the array as at the maximum base number!
-	//return true;
 
 	return bIsLargest;
 }
@@ -113,12 +99,12 @@ void NumberSet::becomeLargest(){
 }
 
 long long int NumberSet::getPossibleLargest() const {
-	return (long long int) pow((long double) base, (int) digits) - 1;
+	return biggestNumber;
 }
 
 std::ostream& operator<<(std::ostream& os, const NumberSet& ns){
 
-	for (int i = 0; i < ns.digits; ++i){
+	for (uint i = 0; i < ns.digits; ++i){
 		os << std::right << std::setw(4) << ns.numberArr[i];
 	}
 	return os;

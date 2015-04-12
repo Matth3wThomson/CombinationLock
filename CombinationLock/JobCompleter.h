@@ -38,8 +38,6 @@ public:
 	   tasks and render the job completer useless until destruction. */
 	void CloseOnceComplete();
 
-	//bool JobsLeft();
-
 private:
 	void Initialize(unsigned int requestedThreads);
 	void acquireJob();

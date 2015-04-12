@@ -18,8 +18,6 @@ NOTES:
 		-Performance of exceptions that arent thrown or caught identical to functions that dont throw,
 		 therefore exceptions used on functions where matrices must be of identical size, as program
 		 crash is desired. (BENCHMARK: 10000 valid add operations)
-		-Division of matrices not done since it is technically the multiplication of the inverse,
-		 and the inverse of a matrix isn't easy to compute!
 		-There are functions with duplicate purposes, this is simply to make the class easier for a third
 		 party to understand its implementation
 		-Square brackets and at function implemented without safeguards purposefully, to make the class feel

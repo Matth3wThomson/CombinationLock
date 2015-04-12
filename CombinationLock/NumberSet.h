@@ -13,24 +13,24 @@
 	this will represent a number of a supplied base, and a supplied number
 	of digits.
 
-	Notes: With base being an integer, this theoretically allows for numbers up
-			to base 2^32. This would allow you to represent absolutely huge numbers,
-			and is not necessary for the purposes of this task, and could be optimized
-			by using a short. However, in the interest of reusability this optimization
-			has been ignored.
+	Notes: With base being a short, this theoretically allows for numbers up
+			to base 2^16. This would allow you to represent absolutely huge numbers,
+			and is not necessary for the purposes of this task, and other functionality
+			would break down reaching these numbers. However, its intended purpose
+			is not meant for numbers that large.
 */
 
-//TODO: numberArr can be unsigned too.
 class NumberSet
 {
 	//Properties
 private:
 
-	int* numberArr;
-	unsigned int base, digits;
+	unsigned int* numberArr; //The new representation of the number
+	unsigned short base, digits; //The base and number of digits
 
-	unsigned long long int biggestNumber;
-	unsigned long long int baseTen;
+	//Note, at high base and digits, an unsigned long long int isnt large enough.
+	unsigned long long int biggestNumber; //The biggest number this is possible to hold
+	unsigned long long int baseTen; //The base10 representation of this number.
 
 public:
 	NumberSet(const unsigned int base, const unsigned int digits);

@@ -25,7 +25,6 @@ void JobCompleter::Initialize(uint requestedThreads){
 	else activeThreads = requestedThreads;
 
 	for (uint i = 0; i < activeThreads; ++i){
-		//threadArray.emplace_back(std::thread(&JobCompleter::acquireJob, this));
 		threadArray.emplace_back(&JobCompleter::acquireJob, this);
 	}
 }
@@ -43,7 +42,6 @@ void JobCompleter::acquireJob(){
 		}
 		jobQueueMut.unlock();
 
-		//TODO: Work out if this is the correct way to go about this.
 		if (func) func();
 		else std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
