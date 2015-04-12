@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 
 /**
 	Class: NumberSet
@@ -19,6 +20,7 @@
 			has been ignored.
 */
 
+//TODO: numberArr can be unsigned too.
 class NumberSet
 {
 	//Properties
@@ -26,6 +28,9 @@ private:
 
 	int* numberArr;
 	unsigned int base, digits;
+
+	unsigned long long int biggestNumber;
+	unsigned long long int baseTen;
 
 public:
 	NumberSet(const unsigned int base, const unsigned int digits);
@@ -41,10 +46,15 @@ public:
 	/* Returns a boolean to determine whether the numberset is currently
 	   the largest number it is possible to be 
 	*/
-	bool isLargest();
+	bool isLargest() const ;
 
 	/* Causes the number to become the largest possible number it can represent */
 	void becomeLargest();
+
+	/* Returns the highest number this numberSet can hold in base 10 */
+	long long int getPossibleLargest() const;
+
+	friend std::ostream& operator<<(std::ostream& stream, const NumberSet& numberSet);
 
 private:
 	//No default construction
