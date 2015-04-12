@@ -23,22 +23,22 @@
 	Author: Matthew Thomson 2015
 
 	Notes:
-		-Can choose between threaded or non threaded implementation (as above)
-			-JobCompleter automates all threading using a job queue system. Reusable.
-		-Uses a NumberSet (similar to bitset, with customizable base) to enumerate all
-		 possible combinations.
-		-Set used for dictionary storage as binary search for words increases efficiency.
-			-Could have reserved space (to prevent multiple reallocations), but chose not to
-			as cannot assume amount of memory available, or accidentally overestimate on small
-			cases.
-		-The specification states that "there is no need to remove duplicate words and the
-		 order of the output word list does not matter." Therefore the program outputs
-		 all words that it finds, including duplicates, and the number of words found, 
-		 even though the supplied output file has duplicates removed.
-*/
+	-Can choose between threaded or non threaded implementation (as above)
+	-JobCompleter automates all threading using a job queue system. Reusable.
+	-Uses a NumberSet (similar to bitset, with customizable base) to enumerate all
+	possible combinations.
+	-Set used for dictionary storage as binary search for words increases efficiency.
+	-Could have reserved space (to prevent multiple reallocations), but chose not to
+	as cannot assume amount of memory available, or accidentally overestimate on small
+	cases.
+	-The specification states that "there is no need to remove duplicate words and the
+	order of the output word list does not matter." Therefore the program outputs
+	all words that it finds, including duplicates, and the number of words found,
+	even though the supplied output file has duplicates removed.
+	*/
 
 /* Essentially main for this task, but wrapped for brevity */
-void SolveCombinationLock(const char* wheelFile, 
+void SolveCombinationLock(const char* wheelFile,
 	const char* dictionaryFile,
 	std::vector<std::string>& output);
 
@@ -49,7 +49,7 @@ bool ParseDictionary(const char* filename, std::set<std::string>& dictionary);
 Matrix<char> ParseWheel(const char* filename);
 
 
-/* Searches through a wheel through every possible combination to find any words in the 
+/* Searches through a wheel through every possible combination to find any words in the
 dictionary. Intended for sequential purposes. */
 void FindAllWords(const std::set<std::string>& dictionary,
 	const Matrix<char>& wheel,
@@ -65,7 +65,7 @@ void FindWordsFunction(unsigned int index,
 
 int main(int argc, char* argv[]){
 
-	if (argc < 2) std::cerr << "Please pass the arguments in the format programName WheelsFilePath DictionaryFilePath"; 
+	if (argc < 2) std::cerr << "Please pass the arguments in the format programName WheelsFilePath DictionaryFilePath";
 
 	if (!argv[1] || !argv[2]){
 		std::cerr << "Please pass the arguments in the format programName WheelsFilePath DictionaryFilePath";
@@ -82,11 +82,15 @@ int main(int argc, char* argv[]){
 		return -2;
 	}
 
-	//Now to output all words found by the SolveCombinationLock method
+	//Now to output all words found by the SolveCombinationLock method.
+	//Spec was fairly unclear about output from program, so there is alternative
+	//code commented for outputting in format it hints at.
 	for (auto itr = output.begin(); itr != output.end(); ++itr){
-	std::cout << argv[0] << ">" << (*itr) << std::endl;
+		//std::cout << argv[0] << ">" << (*itr) << std::endl;
+		std::cout << (*itr) << std::endl;
 	}
-	std::cout << argv[0] << ">Found " << output.size() << " words";
+	//std::cout << argv[0] << ">Found " << output.size() << " words";
+	std::cout << output.size() << " words";
 
 	system("pause");
 
@@ -106,7 +110,7 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile, std
 	int noWheels, noLetters;
 	noWheels = wheel.getHeight();
 	noLetters = wheel.getWidth();
-	
+
 #if THREADED
 	//Create jobCompleter with as many threads as is optimal for our solution
 	JobCompleter jobCompleter(noLetters);
@@ -118,7 +122,7 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile, std
 	//in the constructor.
 	for (int i = 0; i < noLetters; ++i){
 		jobCompleter.GiveJob(
-			[i, &dictionary, &wheel, &foundWords, &outputListMutex]{ 
+			[i, &dictionary, &wheel, &foundWords, &outputListMutex]{
 			FindWordsFunction(i, dictionary, wheel, foundWords, outputListMutex);
 		}
 		);
@@ -146,7 +150,7 @@ bool ParseDictionary(const char* filename, std::set<std::string>& dictionary){
 			//Load in the string
 			std::string temp(" ");
 			file >> temp;
-			
+
 			if (temp == " ") throw std::exception("Error loading dictionary file");
 
 			//Ensure that the word is indeed in lower case, and insert into dictionary
@@ -186,7 +190,7 @@ Matrix<char> ParseWheel(const char* filename){
 			for (unsigned int j = 0; j < noLetters; ++j){
 				char temp = ' ';
 				file >> temp;
-				
+
 				if (temp == ' ') throw std::exception("Bad wheel file. Doesn't match specification");
 				wheel.setElement(i, j, tolower(temp));
 			}
@@ -231,7 +235,7 @@ void FindWordsFunction(unsigned int index,
 			//Initialize the first element to the value of the wheel we are currently
 			//starting at, and the index we are currently using as our start index
 			word[0] = wheel.getElement(i, index);
-			
+
 			//We now want to try every combination of the wheels left, with the word length
 			//we want. So we need a number set of size j-1, with base noLetters
 			NumberSet possibleCombination(noLetters, j - 1);
@@ -260,7 +264,7 @@ void FindWordsFunction(unsigned int index,
 
 				++possibleCombination;
 
-			//Until we have tried all combinations
+				//Until we have tried all combinations
 			} while (!finished);
 		}
 	}
