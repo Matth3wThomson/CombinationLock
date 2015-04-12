@@ -32,7 +32,7 @@
 	-For 0 to M, create threads (up to the maximum allowed by the CPU), and search from their starting index
 	through each wheel (0 - M), for (0 - N) wheels.
 
-	-For each word that is in the dictionary push to a words found set.
+	-For each word that is in the dictionary push to a words found vector (we want duplicates).
 
 	-Output results to the screen
 
@@ -55,14 +55,25 @@ bool ParseDictionary(const char* filename, std::set<std::string>& dictionary);
 /* Parses all information from supplied file into matrix of MxN */
 Matrix<char> ParseWheel(const char* filename);
 
-/* Searches through a wheel, from a given start index, comparing words to dictionary */
+
+/* Searches through a wheel through every possible combination to find any words in the 
+dictionary. Intended for sequential purposes. */
+void FindAllWords(const std::set<std::string>& dictionary,
+	const Matrix<char>& wheel,
+	std::vector<std::string>& output);
+
+/* Searches through a wheel, from a given start index, comparing words to dictionary.
+	Allows for threading */
 void FindWordsFunction(int index,
 	const std::set<std::string>& dictionary,
 	const Matrix<char>& wheel,
-	std::set<std::string>& output);
+	std::vector<std::string>& output);
 
 //TODO: Remove
 void testNumberSet();
+
+/* Parses the output file and couts all words that were not found in program output */
+void Validator(const char* filename, std::vector<std::string>& programOutput);
 
 int main(int argc, char* argv[]){
 
@@ -112,7 +123,7 @@ void testNumberSet(){
 void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 
 	std::set<std::string> dictionary;
-	std::set<std::string> foundWords;
+	std::vector<std::string> foundWords;
 
 	//Load in the wheel and dictionary
 	Matrix<char> wheel = ParseWheel(wheelFile);
@@ -151,10 +162,12 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	//FindWordsFunction(9, dictionary, wheel, foundWords);
 
 	//Sequential test
-	for (int i = 0; i < noLetters; ++i){
+	/*for (int i = 0; i < noLetters; ++i){
 		std::cout << "Starting from letter " << i << std::endl;
 		FindWordsFunction(i, dictionary, wheel, foundWords);
-	}
+	}*/
+
+	FindAllWords(dictionary, wheel, foundWords);
 	
 
 	//THREADING START
@@ -174,11 +187,16 @@ void SolveCombinationLock(const char* wheelFile, const char* dictionaryFile){
 	//jobCompleter.CloseOnceComplete();
 	//THREADING END
 
+	Validator("output.txt", foundWords);
+
 	//Found words now contains all words found by the find words function
+	/*int foundWordsCount = 0;
 	for (auto itr = foundWords.begin(); itr != foundWords.end(); ++itr){
 		std::cout << (*itr) << std::endl;
+		++foundWordsCount;
 	}
 	std::cout << "Found " << foundWords.size() << " words" << std::endl;
+	std::cout << "Found " << foundWordsCount << " words" << std::endl;*/
 
 	system("pause");
 }
@@ -245,7 +263,7 @@ Matrix<char> ParseWheel(const char* filename){
 void FindWordsFunction(int index,
 	const std::set<std::string>& dictionary,
 	const Matrix<char>& wheel,
-	std::set<std::string>& output){
+	std::vector<std::string>& output){
 
 	//First discover what we need
 	const int& noWheels = wheel.getXDim();
@@ -290,7 +308,7 @@ void FindWordsFunction(int index,
 			}
 
 			//And check if its a word
-			if (dictionary.find(word) != dictionary.end()) output.insert(word);
+			if (dictionary.find(word) != dictionary.end()) output.push_back(word);
 
 			do {
 				//Try the next combination
@@ -306,7 +324,7 @@ void FindWordsFunction(int index,
 				}
 
 				//And check if the word exists in the dictionary
-				if (dictionary.find(word) != dictionary.end()) output.insert(word);
+				if (dictionary.find(word) != dictionary.end()) output.push_back(word);
 
 			//Until we have tried all combinations
 			} while (!possibleCombination.isLargest());
@@ -314,4 +332,116 @@ void FindWordsFunction(int index,
 	}
 
 
+}
+
+void FindAllWords(const std::set<std::string>& dictionary,
+	const Matrix<char>& wheel,
+	std::vector<std::string>& output){
+
+	//First discover what we need
+	const int& noWheels = wheel.getXDim();
+	const int& noLetters = wheel.getYDim();
+
+	//For each wheel we will start at
+	for (int i = 0; i < noWheels - 1; ++i){
+
+		std::cout << "Thread " << std::this_thread::get_id() << " testing from wheel " << i << std::endl;
+
+		//For all possible lengths of words we can look for given the wheel
+		//we are starting at
+		for (int j = 2; j <= noWheels - i; ++j){
+
+			std::cout << "Thread " << std::this_thread::get_id() << " testing words of length " << j << std::endl;
+
+			//Store the word we are going to search for, which is of size j
+			//char* const word = new char[j];
+			std::string word = std::string(j, ' ');
+
+			//We now want to try every combination of the wheels left, with the word length
+			//we want. So we need a number set of size j-1, with base noLetters
+			NumberSet possibleCombination(noLetters, j);
+
+			//Get the next word by retrieving the indexes we want
+			for (int letter = 0; letter < j; ++letter){
+
+				// -The letter we want is in the the wheel at i + letter we are looking at.
+				// -The letter we are going to choose is based on the possible combination we
+				//	are trying next. This is in the combination at letter - 1 (it is of size j - 1 )
+				word[letter] = wheel.getElement(i + letter, possibleCombination.getDigit(letter));
+			}
+
+			//And check if its a word
+			if (dictionary.find(word) != dictionary.end()) output.push_back(word);
+
+			do {
+				//Try the next combination
+				++possibleCombination;
+
+				//Make our words change their letters appropriately
+				for (int letter = 0; letter < j; ++letter){
+
+					// -The letter we want is in the the wheel at i + letter we are looking at.
+					// -The letter we are going to choose is based on the possible combination we
+					//	are trying next
+					word[letter] = wheel.getElement(i + letter, possibleCombination.getDigit(letter));
+				}
+
+				//And check if the word exists in the dictionary
+				if (dictionary.find(word) != dictionary.end()) output.push_back(word);
+
+				//Until we have tried all combinations
+			} while (!possibleCombination.isLargest());
+		}
+	}
+
+
+}
+
+void Validator(const char* filename, std::vector<std::string>& programOutput){
+
+	std::ifstream file;
+
+	file.open(filename);
+
+	if (file.is_open()){
+
+		std::set<std::string> outputFile;
+
+		while (!file.eof()){
+			std::string temp;
+			file >> temp;
+
+			if (temp == "Found") 
+				break;
+
+			std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+			outputFile.insert(temp);
+		}
+
+		int wordsDifferent = 0;
+
+		std::cout << "Output file contains: " << outputFile.size() << std::endl;
+		std::cout << "Program's output contains: " << programOutput.size() << std::endl;
+		
+		for (auto itr = programOutput.begin(); itr != programOutput.end(); ++itr){
+			if (outputFile.find(*itr) == outputFile.end())
+				std::cout << *itr << " not in output file. " << std::endl;
+		}
+
+		for (auto itr = outputFile.begin(); itr != outputFile.end(); ++itr){
+
+			bool found = false;
+
+			for (auto itr2 = programOutput.begin(); itr2 != programOutput.end(); ++itr2){
+				if ((*itr2) == (*itr)){ found = true;  break; }
+			}
+
+			if (!found){
+				++wordsDifferent;
+				std::cout << (*itr) << " not present in program output. " << std::endl;
+			}
+		}
+
+		std::cout << "Missing words: " << wordsDifferent << std::endl;
+	}
 }
