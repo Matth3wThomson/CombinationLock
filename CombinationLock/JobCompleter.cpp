@@ -25,7 +25,7 @@ void JobCompleter::Initialize(uint requestedThreads){
 	else activeThreads = requestedThreads;
 
 	for (uint i = 0; i < activeThreads; ++i){
-		threadArray.push_back(std::thread(&JobCompleter::acquireJob, this));
+		threadArray.emplace_back(std::thread(&JobCompleter::acquireJob, this));
 	}
 }
 
