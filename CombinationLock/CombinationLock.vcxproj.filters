@@ -22,6 +22,9 @@
     <ClInclude Include="JobCompleter.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

@@ -88,6 +88,7 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixDefinition.h" />
     <ClInclude Include="NumberSet.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
